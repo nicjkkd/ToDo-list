@@ -1,0 +1,15 @@
+.main-block {
+  display: block;
+  text-align: center;
+}
+
+.input-list-block {
+  display: flex;
+  flex-direction: column;
+}
+button {
+  margin: 10px;
+}
+input {
+  margin: 3px;
+}
