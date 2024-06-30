@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
+import React, { FunctionComponent, useState, useEffect } from "react";
 import WelcomeBack from "src/components/WelcomeBack";
 import Task from "src/components/Task";
 import "./ToDoStyles.css";
@@ -13,14 +13,16 @@ export interface TaskI {
   description: string;
 }
 
-const getInitialState = (id: string) => {
+const getStateFromLocalStorage = (id: string) => {
   const initialState = localStorage.getItem(id);
   if (!initialState) return [];
   return JSON.parse(initialState) as Array<TaskI>;
 };
 
 const ToDo: FunctionComponent<Props> = (props) => {
-  const [list, setList] = useState<Array<TaskI>>(getInitialState(props.id));
+  const [list, setList] = useState<Array<TaskI>>(
+    getStateFromLocalStorage(props.id)
+  );
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -51,19 +53,37 @@ const ToDo: FunctionComponent<Props> = (props) => {
   };
 
   const handleSave = () => {
+    const prevState = localStorage.getItem(props.id);
+    if (prevState) {
+      localStorage.setItem(props.id + "_prev", prevState);
+    }
     localStorage.setItem(props.id, JSON.stringify(list));
   };
+
+  const handleRevert = () => {
+    const prevState = getStateFromLocalStorage(props.id + "_prev");
+    console.log(prevState);
+    setList(prevState);
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", (event) => {
+      if (event.metaKey && event.key === "z") {
+        handleRevert();
+      }
+    });
+  }, []);
 
   return (
     <div className="main-block">
       <WelcomeBack>{props.userName}</WelcomeBack>
       <button onClick={handleClick}>Add new task</button>
       <div className="input-list-block">
-        {list.map((elem, index) => {
+        {list.map((task, index) => {
           return (
             <Task
               index={index}
-              elem={elem}
+              task={task}
               handleChange={handleChange}
               handleDelete={handleDelete}
             ></Task>
@@ -71,8 +91,17 @@ const ToDo: FunctionComponent<Props> = (props) => {
         })}
       </div>
       <button onClick={handleSave}>Save</button>
+      <button onClick={handleRevert}>Revert last changes</button>
     </div>
   );
 };
 
 export default ToDo;
+
+// current id = props.id
+// 1. пофіксити багу з ревертом для всіх
+// 2. безкінечний ctr + z
+// 3. cmd + shift + z - відміняє команд з
+// 4. useeffect && key in React for custom components
+// значення зберігати не окремою id а в масив
+//

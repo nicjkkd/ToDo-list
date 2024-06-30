@@ -3,14 +3,14 @@ import { TaskI } from "src/container/ToDo";
 
 interface Props {
   index: number;
-  elem: TaskI;
+  task: TaskI;
   handleChange(event: React.ChangeEvent<HTMLInputElement>, index: number): void;
   handleDelete(index: number): void;
 }
 
 const Task: FunctionComponent<Props> = ({
   index,
-  elem,
+  task,
   handleChange,
   handleDelete,
 }) => {
@@ -23,7 +23,7 @@ const Task: FunctionComponent<Props> = ({
           handleChange(event, index);
         }}
         key={index}
-        value={elem.name}
+        value={task.name}
       ></input>
       <input
         name="ToDo description"
@@ -31,7 +31,7 @@ const Task: FunctionComponent<Props> = ({
           handleChange(event, index);
         }}
         key={index}
-        value={elem.description}
+        value={task.description}
       ></input>
       <button
         onClick={() => {
